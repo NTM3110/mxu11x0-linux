@@ -1,0 +1,20 @@
+# Codex workspace metadata
+/.agents/
+/.codex/
+/.repo-git/
+
+# Local kernel-module build directory
+/build-current/
+
+# Kernel build outputs
+*.ko
+*.o
+*.mod
+*.mod.c
+*.order
+*.symvers
+.*.cmd
+.*.d
+
+# Build logs
+build.log
