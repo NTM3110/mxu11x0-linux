@@ -1,0 +1,86 @@
+===============================================================================
+Changes from the original Moxa UPort 1100 Linux driver
+===============================================================================
+
+Project release date: 2026-10-19
+Upstream baseline:    Moxa UPort 1100 Series driver v6.0 (2023-03-14)
+
+The original source used for this comparison is preserved in:
+example/meta-moxa/recipes-kernel/uport1100/files/
+
+1. Additional device support
+----------------------------
+
+- Added support for the Moxa USB device with product ID 0x7001.
+- Added the 0x7001 USB ID table and registered its usb-serial driver.
+- Added the device firmware image in driver/mxu7001_fw.h.
+- Added model detection, firmware download, and one-port initialization for the
+  new device.
+- Added selectable RS-232, RS-422, two-wire RS-485, and four-wire RS-485 modes.
+- Added build-time controls for the default mode and for disabling individual
+  modes:
+
+    DEFAULT_UART_MODE=0  RS-485 two-wire (default)
+    DEFAULT_UART_MODE=1  RS-232
+    DEFAULT_UART_MODE=2  RS-422
+    DEFAULT_UART_MODE=3  RS-485 four-wire
+
+    NOT_ALLOW_RS232
+    NOT_ALLOW_RS422
+    NOT_ALLOW_RS4852W
+    NOT_ALLOW_RS4854W
+
+2. Linux kernel compatibility
+-----------------------------
+
+- Updated write_room and chars_in_buffer callback return types for Linux 5.14
+  and newer.
+- Updated set_termios to accept a const old-termios argument on Linux 6.1 and
+  newer.
+- Updated break_ctl to return an integer on Linux 6.17 and newer.
+- Verified that the module builds for Ubuntu kernel 7.0.0-34-generic.
+
+These are compatibility changes for newer kernel APIs. The serial data path and
+the behavior of the original UPort 1110, 1130, 1130I, 1150, 1150I, and USB
+Console devices remain based on the Moxa v6.0 implementation.
+
+3. Installation improvements
+----------------------------
+
+- Added install-current.sh for building and installing against the currently
+  running kernel.
+- The installer checks the module vermagic and rebuilds automatically after a
+  kernel upgrade when the existing module no longer matches.
+- The installer reports missing kernel headers before attempting a build.
+- Builds started through sudo run as the original user when possible, avoiding
+  root-owned build files in the project directory.
+- The module is installed to:
+
+    /lib/modules/$(uname -r)/updates/mxu11x0.ko
+
+- The installer runs depmod, loads mxu11x0, and displays the loaded module
+  status.
+- The conflicting ti_usb_3410_5052 driver is unloaded and blacklisted through
+  /etc/modprobe.d/moxa-uport.conf.
+
+Install with:
+
+    sudo ./install-current.sh
+
+4. Repository packaging
+-----------------------
+
+- Added .gitignore rules for generated kernel objects, modules, command files,
+  build logs, and local workspace metadata.
+- Compiled .ko files are not distributed through Git. Each system builds a
+  module that matches its running kernel.
+
+5. Unchanged upstream material
+------------------------------
+
+- The project retains the original Moxa GPLv2 license notice, documentation,
+  firmware headers, ARM porting guide, legacy installer, and Yocto example.
+- version.txt contains Moxa's original v6.0 release history and has not been
+  replaced by this project-specific change summary.
+
+-End-
